@@ -1,70 +1,40 @@
-# Bhairavnath big shopy — free Store Pickup website starter
+# Bhairavnath Big Shopy — Firebase starter v2
 
-This is a mobile-friendly grocery ordering website with:
-- Marathi / Hindi / English interface
-- Product catalog, category filter, search and cart
-- Store pickup time selection
-- Cash or UPI payment at the store (no payment gateway)
-- Order submission and customer order lookup
-- Admin login, product CRUD and order status updates
+This package contains a customer page (`index.html`) and an admin page (`admin.html`).
 
-## Important before using it for real customers
-This starter is not connected to a database until you complete the Firebase setup below. The storefront displays demo products until Firebase is configured; demo orders cannot be submitted. Do not publish it as production-ready before setting up Firebase and reviewing the security rules. Order statuses are managed in the Admin Panel. Customer-facing order tracking needs a secure order token or customer login; the phone lookup UI is only a placeholder and will not read orders under the secure default rules.
+## Features in this starter
+- Admin email/password sign-in
+- Add products with name, optional price, optional image, hide/show and delete
+- Customer product catalogue; price appears only when the admin entered one
+- Customer order form (name, 10-digit phone, items and notes)
+- Customer request form for products not listed
+- Admin order list and status changes: Order Placed, Preparing Order, Ready for Pick-up, Completed, Cancelled
+- Basic order-status lookup using a display Order ID
 
-## 1. Create a free Firebase project
-1. Open https://console.firebase.google.com/ and create a project named `bhairavnath-big-shopy`.
-2. Add a Web App in Project settings and copy the Firebase configuration.
-3. In Authentication → Sign-in method, enable **Email/Password**.
-4. In Authentication → Users, add your admin email and a strong password.
-5. In Firestore Database, create a database (choose a location close to your customers if available).
-6. Replace `REPLACE_WITH_YOUR_ADMIN_EMAIL` in `firestore.rules` with the exact admin email.
-7. Publish the Firestore rules.
+## Important limitations / safety
+- This is a starter, not a deployed/fully verified store. Configure Firebase before using it.
+- Do not put customer data in a public GitHub repository. Only website source files belong there.
+- The current simple order-status lookup uses a public `orderCodes` collection to find an order by display ID. For production, do NOT deploy this as-is because it is not a secure identity check and order status lookup is not protected by phone OTP. Implement Firebase Phone Authentication or a trusted Cloud Function before taking real customer orders.
+- Public visitors can submit order/product-request forms, so spam controls/rate limits should be added before production.
+- Never publish Firebase service-account keys. Web app config is not a service-account secret, but Firestore/Storage Security Rules must be correctly deployed.
+- Firestore and Storage rules below require you to replace `PASTE_ADMIN_UID_HERE` with your Admin user's Firebase Authentication UID.
+- Firebase free-tier availability/quotas can change; some features may require billing setup depending on usage/region.
 
-## 2. Add your Firebase config
-In both `index.html` and `admin.html`, find `const firebaseConfig =` (in admin it is `const firebaseConfig=`) and replace:
-- `PASTE_API_KEY`
-- `PASTE_PROJECT_ID`
-- `PASTE_SENDER_ID`
-- `PASTE_APP_ID`
-with the values from Firebase Project settings → Your apps. Keep the quotes.
+## Setup from mobile
+1. Extract this ZIP on your phone.
+2. In Firebase Console, open your project.
+3. Go to Project settings (gear) > General > Your apps > Add app > Web (`</>`). Register the app and copy the web config values into `firebase-config.js`.
+4. Firebase Console > Build > Authentication > Get started > Sign-in method > enable Email/Password.
+5. Authentication > Users > Add user. Create your admin email/password, then open that user and copy the UID.
+6. Firestore Database > Create database. Start in production mode.
+7. Paste the contents of `firestore.rules` in Firestore Database > Rules after replacing `PASTE_ADMIN_UID_HERE` with your Admin UID, then Publish.
+8. Storage > Get started; paste `storage.rules` after replacing the same UID and publish. If Storage asks for a billing plan, do not enable billing unless you understand the charges; you can use products without photos until storage is configured.
+9. Upload `index.html`, `admin.html`, `style.css`, `app.js`, `admin.js`, and `firebase-config.js` to your GitHub repository root. Do not upload rule files or customer data to GitHub.
+10. In GitHub repo Settings > Pages, choose Deploy from a branch, `main`, `/(root)`, Save.
+11. Open the Pages website and `/admin.html` to sign in.
 
-Firebase web config is not a secret, but the Firestore security rules are essential. Never put a service-account key in this website.
+## Mobile upload notes
+GitHub's mobile interface may allow uploading files one at a time. Ensure `firebase-config.js` values are correct before expecting data to load.
 
-## 3. Deploy for free
-### Option A: GitHub Pages
-1. Create a GitHub repository.
-2. Upload `index.html`, `admin.html`, and any other needed files from this folder.
-3. In repository Settings → Pages, choose deploy from the main branch/root.
-4. Your customer site will be at `https://YOUR-USERNAME.github.io/REPOSITORY/`.
-5. Admin page: `https://YOUR-USERNAME.github.io/REPOSITORY/admin.html`.
-
-### Option B: Cloudflare Pages
-1. Create a Cloudflare account and open Workers & Pages.
-2. Create a Pages project from your Git repository.
-3. Use the repository root as the build output directory; no build command is needed.
-4. Use the URL Cloudflare gives you.
-
-## 4. Add products
-1. Open `admin.html` on the deployed site.
-2. Sign in with the Firebase admin user you created.
-3. Add products with English, Marathi and Hindi names, category, price, stock, and emoji.
-4. Customers can then place orders from the homepage.
-
-## 5. How store pickup works
-- Customer adds products to cart and submits their name, mobile, pickup slot and payment preference.
-- Payment happens at your store in cash or UPI. No payment gateway is included.
-- Admin changes order status to Preparing, Ready for Pickup, and Completed.
-- Customer-facing order status tracking is not enabled by default because exposing orders by phone number is not secure. Add a secure tracking token/auth flow before enabling it.
-
-## 6. Free-plan and cost notes
-- GitHub Pages and Cloudflare Pages have free tiers; quotas and terms can change.
-- Firebase has a no-cost Spark plan, but quotas and features vary by product. Monitor usage in the Firebase console.
-- A custom domain such as `bhairavnathbigshopy.com` is usually paid; use the free provider subdomain to stay at ₹0.
-- No SMS/WhatsApp notifications are included.
-- Free hosting does not mean unlimited traffic or guaranteed uptime.
-
-## 7. Security notes (please read)
-- Firebase API config is meant to be included in frontend apps; access is controlled by Firebase Security Rules.
-- Admin write access is limited to the email configured in `firestore.rules`.
-- Order documents are readable only by the admin account. Do not loosen these rules to expose orders by phone number; use an order-specific random tracking token or customer authentication to add customer tracking safely.
-- Test order placement, product editing, and status updates with a test customer before sharing the website publicly.
+## Before real launch
+Have someone technically experienced review security rules and implement secure customer order access using Firebase Phone Authentication / OTP or a trusted backend. Test with dummy data first.
