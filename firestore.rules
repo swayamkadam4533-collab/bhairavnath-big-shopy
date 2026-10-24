@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // IMPORTANT: replace this placeholder with your own Firebase Auth UID.
     function isAdmin() {
-      return request.auth != null && request.auth.uid == "mhrmLM6UJdbGRF4mkoVfrNK9nHH3";
+      return request.auth != null && request.auth.uid == "PASTE_ADMIN_UID_HERE";
     }
     match /products/{productId} {
       allow read: if true;
